@@ -1,6 +1,11 @@
-﻿namespace api.Models.Enums
+﻿using System.Text.Json.Serialization;
+
+namespace api.Models.Enums
 {
-    public class Semesters
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum Semesters
     {
-    }
+        Autumn,
+        Spring
+    };
 }

@@ -1,6 +1,13 @@
-﻿namespace api.Models.Enums
+﻿using System.Text.Json.Serialization;
+
+namespace api.Models.Enums
 {
-    public class CourseStatuses
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum CourseStatuses
     {
-    }
+        Created, 
+        OpenForAssigning, 
+        Started, 
+        Finished
+    };
 }

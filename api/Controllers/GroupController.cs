@@ -2,6 +2,8 @@
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using api.Exceptions;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -24,7 +26,8 @@ namespace api.Controllers
         {
             var authorizationHeader = Request.Headers["Authorization"].ToString();
             var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
-            return Ok(await _groupService.CreateCampusGroup(createCampusGroupModel, token));
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _groupService.CreateCampusGroup(createCampusGroupModel, token, userId));
         }
 
         [Authorize]
@@ -34,6 +37,29 @@ namespace api.Controllers
             var authorizationHeader = Request.Headers["Authorization"].ToString();
             var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
             return Ok(await _groupService.GetCampusGroup(token));
+        }
+
+        [HttpPut("groupe/{id}")]
+        [Authorize]
+        public async Task<IActionResult> EditGroup([FromRoute] Guid id, [FromBody] EditCampusGroupModel editCampusGroupModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _groupService.EditCampusCourse(editCampusGroupModel, id, token, userId));
+        }
+
+        [HttpDelete("group/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteComment([FromRoute] Guid id)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            await _groupService.DeleteCampusGroup(id, userId);
+            return Ok();
         }
     }
 }

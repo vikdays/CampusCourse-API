@@ -17,7 +17,7 @@ namespace api.Services.Impls
             _accountService = accountService;
         }
 
-        public async Task<CampusGroupModel> CreateCampusGroup(CreateCampusGroupModel createCampusGroupModel, string token)
+        public async Task<CampusGroupModel> CreateCampusGroup(CreateCampusGroupModel createCampusGroupModel, string token, string userId)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -48,6 +48,24 @@ namespace api.Services.Impls
             }
             var groups = _db.CampusGroups.Select(g => GroupMapper.MapFromCampusGroupToCampusGroupModel(g)).ToList();
             return groups;
+        }
+
+        public async Task<CampusGroupModel> EditCampusCourse(EditCampusGroupModel editCampusGroupModel, Guid groupId, string token, string userId)
+        {
+            var group = GroupMapper.MapFromEditCampusGroupModelToCampusGroup(editCampusGroupModel, groupId);
+            _db.CampusGroups.Update(group);
+            await _db.SaveChangesAsync();
+            return GroupMapper.MapFromCampusGroupToCampusGroupModel(group);
+        }
+
+        public async Task DeleteCampusGroup(Guid id, string userId)
+        {
+            var user = await _accountService.GetUserById(userId);
+            var group = await _db.CampusGroups.FindAsync(id);
+            if (group == null) throw new NotFoundException(ErrorConstants.NotFoundGroupError);
+            // if (user.Id != comment.AuthorId) throw new CustomException("You are not the author of this comment", 403);
+            _db.Remove(group);
+            await _db.SaveChangesAsync();
         }
     }
 }

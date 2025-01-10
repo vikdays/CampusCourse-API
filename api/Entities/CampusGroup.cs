@@ -12,5 +12,7 @@ namespace api.Entities
         [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
         [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.NameLengthError)]
         public string Name { get; set; }
+
+        public ICollection<CampusCourse> CampusCourses { get; set; }
     }
 }

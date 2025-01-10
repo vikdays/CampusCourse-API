@@ -15,7 +15,8 @@
     public const string EmailValidError = "Email is invalid";
     public const string ComparePasswordError = "Passwords must be identical.";
     public const string UnauthorizedError = "Unauthorized";
-    
+    public const string NotFoundGroupError = "Group Not Found";
+
 
     public const string ProfileAlreadyExistsError = "Profile already exist";
     public const string ProfileNotExistsError = "Profile not exist";

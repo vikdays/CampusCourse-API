@@ -22,5 +22,14 @@ namespace api.Mappers
                 Name = campusGroup.Name
             };
         }
+        public static CampusGroup MapFromEditCampusGroupModelToCampusGroup(EditCampusGroupModel editCampusGroupModel, Guid groupId)
+        {
+            return new CampusGroup
+            {
+                Id = groupId,
+                Name = editCampusGroupModel.Name
+            };
+        }
+        
     }
 }
