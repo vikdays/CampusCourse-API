@@ -42,7 +42,7 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
 
     public string GetIdByToken(string token)
     {
-        if (!tokenHandler.CanReadToken(token)) throw new UnauthorizedException();
+        if (!tokenHandler.CanReadToken(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
 
         var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
 
@@ -54,10 +54,10 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
             {
                 Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
             }
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
         var userId = userIdClaim.Value;
-        if (userId == null) throw new UnauthorizedException();
+        if (userId == null) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
 
         return userId;
     }
@@ -65,10 +65,10 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
     public string ExtractTokenFromHeader(string authorizationHeader)
     {
         if (string.IsNullOrEmpty(authorizationHeader))
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
 
         if (!authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
 
         return authorizationHeader.Substring("Bearer ".Length).Trim();
     }

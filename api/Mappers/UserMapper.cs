@@ -6,7 +6,6 @@
         {
             Name = userRegisterModel.FullName,
             BirthDate = userRegisterModel.BirthDate.ToUniversalTime(),
-            CreateTime = DateTime.Now.ToUniversalTime(),
             Email = userRegisterModel.Email,
             Gender = userRegisterModel.Gender,
             Id = Guid.NewGuid(),

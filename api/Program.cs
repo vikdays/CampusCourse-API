@@ -1,5 +1,6 @@
 
 using api.Middleware;
+using api.Services.Impls;
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,7 @@ namespace api
 
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IGroupService, GroupService>();
 
 
             services.AddSwaggerGen(options =>
@@ -75,8 +77,11 @@ namespace api
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer"
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "Authorized",
                 });
+
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {

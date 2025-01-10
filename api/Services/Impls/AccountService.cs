@@ -58,7 +58,7 @@ public class AccountService : IAccountService
     public async Task<Response> Logout(string token)
     {
         token = _tokenService.ExtractTokenFromHeader(token);
-        if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException();
+        if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         _db.BannedTokens.Add(new TokenEntity { Token = token });
         await _db.SaveChangesAsync();
         return await Task.FromResult(new Response(null, "Logout successful"));
@@ -68,18 +68,18 @@ public class AccountService : IAccountService
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
 
         if (await _tokenService.IsTokenBanned(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
 
         var userId = _tokenService.GetIdByToken(token);
         if (string.IsNullOrWhiteSpace(userId))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
 
         var user = await _db.Users.FirstOrDefaultAsync(user => user.Id.ToString() == userId);
@@ -96,12 +96,12 @@ public class AccountService : IAccountService
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
 
         if (await _tokenService.IsTokenBanned(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
         var user = await GetUserByToken(token);
         return UserMapper.MapFromEntityToUserProfileModel(user);
@@ -111,12 +111,12 @@ public class AccountService : IAccountService
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
 
         if (await _tokenService.IsTokenBanned(token))
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
         var user = await GetUserByToken(token);
         user = UserMapper.MapFromUserProfileModelToEntity(userProfileModel, user);

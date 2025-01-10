@@ -18,8 +18,8 @@
 
     public class UnauthorizedException : CustomException
     {
-        public UnauthorizedException()
-            : base("Unauthorized", 401) { }
+        public UnauthorizedException(string message)
+            : base(message, 401) { }
     }
 
     public class ForbiddenException : CustomException

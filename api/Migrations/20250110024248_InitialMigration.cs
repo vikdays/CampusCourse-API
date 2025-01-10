@@ -23,11 +23,22 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CampusGroup",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CampusGroup", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: false),
@@ -45,6 +56,9 @@ namespace api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BannedTokens");
+
+            migrationBuilder.DropTable(
+                name: "CampusGroup");
 
             migrationBuilder.DropTable(
                 name: "User");

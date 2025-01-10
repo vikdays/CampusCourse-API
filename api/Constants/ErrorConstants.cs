@@ -14,6 +14,8 @@
     public const string TagsLengthError = "Minimum item of tags = 1";
     public const string EmailValidError = "Email is invalid";
     public const string ComparePasswordError = "Passwords must be identical.";
+    public const string UnauthorizedError = "Unauthorized";
+    
 
     public const string ProfileAlreadyExistsError = "Profile already exist";
     public const string ProfileNotExistsError = "Profile not exist";
