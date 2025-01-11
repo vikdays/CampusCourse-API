@@ -16,9 +16,12 @@
     public const string ComparePasswordError = "Passwords must be identical.";
     public const string UnauthorizedError = "Unauthorized";
     public const string NotFoundGroupError = "Group Not Found";
+    public const string NotFoundCourseError = "Course Not Found";
     public const string StartYearError = "Start year must be from 2000 to 2029";
     public const string MaximumStudentCount = "Maximum student count must be from 1 to 200";
     public const string ForbiddenError = "User isn't admin";
+    public const string ClosedCourse = "Campus course is not open for signing up.";
+    public const string SignedUpError = "User is already signed up for this course.";
 
 
     public const string ProfileAlreadyExistsError = "Profile already exist";

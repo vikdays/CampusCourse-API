@@ -115,7 +115,7 @@ public class AccountService : IAccountService
         return UserMapper.MapFromEntityToUserProfileModel(user);
     }
 
-    public async Task<Response> EditProfile(UserProfileModel userProfileModel, string token)
+    public async Task<UserProfileModel> EditProfile(UserProfileModel userProfileModel, string token)
     {
         if (string.IsNullOrWhiteSpace(token))
         {
@@ -130,7 +130,7 @@ public class AccountService : IAccountService
         user = UserMapper.MapFromUserProfileModelToEntity(userProfileModel, user);
         _db.Users.Update(user);
         await _db.SaveChangesAsync();
-        return await Task.FromResult(new Response(null, "Edit successful"));
+        return UserMapper.MapFromEntityToUserProfileModel(user);
     }
 
 }

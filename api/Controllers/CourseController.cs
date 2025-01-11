@@ -45,5 +45,17 @@ namespace api.Controllers
             return Ok();
         }
 
+        [HttpPost("courses/{id}/sign-up")]
+        [Authorize]
+        public async Task<IActionResult> SignUpToCourse([FromRoute] Guid id)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            await _courseService.SignUpToCourse(id, userId);
+            return Ok();
+        }
+
     }
 }

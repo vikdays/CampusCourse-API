@@ -29,7 +29,7 @@ public class DataContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CampusCourseStudent>()
-            .HasKey(cs => cs.UserId); 
+            .HasKey(cs => new { cs.UserId, cs.CampusCourseId }); 
 
         modelBuilder.Entity<CampusCourseStudent>()
             .HasOne(cs => cs.CampusCourse)

@@ -15,6 +15,7 @@ namespace api.Mappers
                 Name = createCampusCourseModel.Name,
                 StartYear = createCampusCourseModel.StartYear,
                 MaximumStudentsCount = createCampusCourseModel.MaximumStudentsCount,
+                RemainingSlotsCount = createCampusCourseModel.MaximumStudentsCount,
                 Requirements = createCampusCourseModel.Requirements,
                 Annotation = createCampusCourseModel.Annotations,
                 Semester = createCampusCourseModel.Semester,
@@ -31,7 +32,7 @@ namespace api.Mappers
                 Name = campusCourse.Name,
                 StartYear = campusCourse.StartYear,
                 MaximumStudentsCount = campusCourse.MaximumStudentsCount,
-                RemainingSlotsCount = campusCourse.MaximumStudentsCount,
+                RemainingSlotsCount = campusCourse.RemainingSlotsCount,
                 Semester = campusCourse.Semester,
                 Status = campusCourse.Status
 

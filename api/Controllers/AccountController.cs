@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("account")]
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;

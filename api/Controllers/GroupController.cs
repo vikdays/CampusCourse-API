@@ -62,7 +62,7 @@ namespace api.Controllers
             return Ok();
         }
 
-        [HttpGet("groups/{id}")]
+        [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetCampusGroup([FromRoute] Guid id)
         {
