@@ -13,6 +13,6 @@ namespace api.Entities
         [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.NameLengthError)]
         public string Name { get; set; }
 
-        public ICollection<CampusCourse> CampusCourses { get; set; }
+        public ICollection<CampusCourse> Courses { get; set; } = new List<CampusCourse>();
     }
 }

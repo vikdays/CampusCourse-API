@@ -6,10 +6,10 @@ namespace api.Entities
 {
     [Table("Role")]
     public class Role { 
-        [Key] public Guid Id { get; set; }
+        [Key] public Guid Id { get; set; } 
+        public Guid UserId { get; set; } 
+        public bool IsAdmin { get; set; } = false;
 
-        public string Name { get; set; }
-
-        public ICollection<User> Users { get; set; }
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
 }

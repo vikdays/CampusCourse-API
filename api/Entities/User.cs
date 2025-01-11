@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using api.Entities;
 using api.Models.Enums;
 
 [Table("User")]
@@ -22,5 +23,8 @@ public class User
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.EmailLengthError)]
     public string Email { get; set; }
     public string Password { get; set; }
+
+    public ICollection<Role> Roles { get; set; } = new List<Role>();
+
 
 }

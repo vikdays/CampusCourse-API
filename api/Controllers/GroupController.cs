@@ -32,14 +32,14 @@ namespace api.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetCampusGroup()
+        public async Task<IActionResult> GetCampusGroups()
         {
             var authorizationHeader = Request.Headers["Authorization"].ToString();
             var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
-            return Ok(await _groupService.GetCampusGroup(token));
+            return Ok(await _groupService.GetCampusGroups(token));
         }
 
-        [HttpPut("groupe/{id}")]
+        [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> EditGroup([FromRoute] Guid id, [FromBody] EditCampusGroupModel editCampusGroupModel)
         {
@@ -50,9 +50,9 @@ namespace api.Controllers
             return Ok(await _groupService.EditCampusCourse(editCampusGroupModel, id, token, userId));
         }
 
-        [HttpDelete("group/{id}")]
+        [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteComment([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteGroup([FromRoute] Guid id)
         {
             var authorizationHeader = Request.Headers["Authorization"].ToString();
             var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
@@ -60,6 +60,17 @@ namespace api.Controllers
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
             await _groupService.DeleteCampusGroup(id, userId);
             return Ok();
+        }
+
+        [HttpGet("groups/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetCampusGroup([FromRoute] Guid id)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _groupService.GetCampusGroup(id, userId));
         }
     }
 }

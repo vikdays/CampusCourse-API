@@ -1,4 +1,5 @@
-﻿using api.Exceptions;
+﻿using api.Entities;
+using api.Exceptions;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Crypto.Generators;
@@ -33,6 +34,13 @@ public class AccountService : IAccountService
         Console.WriteLine(user);
 
         await _db.Users.AddAsync(user);
+        var role = new Role
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            IsAdmin = false
+        };
+        _db.Roles.Add(role);
         await _db.SaveChangesAsync();
 
         var token = new TokenResponse { Token = _tokenService.GenerateToken(user) };
