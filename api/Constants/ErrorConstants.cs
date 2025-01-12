@@ -22,6 +22,7 @@
     public const string ForbiddenError = "User isn't admin";
     public const string ClosedCourse = "Campus course is not open for signing up.";
     public const string SignedUpError = "User is already signed up for this course.";
+    public const string EmtyBodyError = "The request body cannot be empty.";
 
 
     public const string ProfileAlreadyExistsError = "Profile already exist";

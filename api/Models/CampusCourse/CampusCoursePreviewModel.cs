@@ -9,11 +9,11 @@ namespace api.Models.CampusCourse
 
         public string? Name { get; set; }
 
-        public int StartYear { get; set; } = 0;
+        public int StartYear { get; set; }
 
-        public int MaximumStudentsCount { get; set; } = 0;
+        public int MaximumStudentsCount { get; set; }
 
-        public int RemainingSlotsCount { get; set; } = 0;
+        public int RemainingSlotsCount { get; set; }
 
         public CourseStatuses Status { get; set; }
 

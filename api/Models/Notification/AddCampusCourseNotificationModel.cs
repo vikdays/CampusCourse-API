@@ -9,7 +9,7 @@ namespace api.Models.Notification
         public string Text { get; set; }
 
         [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-        public bool isImportant { get; set; }
+        public bool IsImportant { get; set; }
 
     }
 }

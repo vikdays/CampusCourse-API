@@ -13,7 +13,7 @@ public class AccountController : ControllerBase
         _tokenService = tokenService;
 
     }
-    [HttpPost("register")]
+    [HttpPost("registration")]
     public async Task<IActionResult> Register(UserRegisterModel userRegisterModel)
     {
         var token = await _accountService.Register(userRegisterModel);
