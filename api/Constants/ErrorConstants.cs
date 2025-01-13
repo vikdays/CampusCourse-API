@@ -23,6 +23,12 @@
     public const string ClosedCourse = "Campus course is not open for signing up.";
     public const string SignedUpError = "User is already signed up for this course.";
     public const string EmtyBodyError = "The request body cannot be empty.";
+    public const string NotInQueueError = "The student is not in queue. Their status cannot be changed.";
+    public const string TeacherSignUpError = "A teacher cannot sign up for their own course.";
+    public const string PreviousStatusError = "Course status cannot be changed to a previous one.";
+    public const string StudentCannootBeTeacherError = "Course's student cannot be a teacher of this course.";
+    public const string ForbiddenTeacherError = "Course's student cannot be a teacher of this course.";
+    public const string AlreadyTeacherError = "This user is already teaching at this course.";
 
 
     public const string ProfileAlreadyExistsError = "Profile already exist";

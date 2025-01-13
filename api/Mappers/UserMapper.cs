@@ -1,4 +1,6 @@
-﻿public abstract class UserMapper
+﻿using api.Models.User;
+
+public abstract class UserMapper
 {
     public static User MapFromRegisterModelToEntity(UserRegisterModel userRegisterModel)
     {
@@ -20,6 +22,15 @@
             FullName = user.Name,
             BirthDate = user.BirthDate,
             Email = user.Email,
+        };
+    }
+
+    public static UserShortModel MapFromEntityToUserShortModel(User user)
+    {
+        return new UserShortModel()
+        {
+            Id = user.Id,
+            FullName = user.Name
         };
     }
     public static User MapFromUserProfileModelToEntity(UserProfileModel userProfileModel, User user)

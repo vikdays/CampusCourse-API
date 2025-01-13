@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace api.Models.CampusCourse
 {
-    public class CreateCampusCourseModel
+    public class EditCampusCourseModel
     {
 
         [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]

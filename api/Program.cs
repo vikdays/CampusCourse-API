@@ -69,6 +69,7 @@ namespace api
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IGroupService, GroupService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
 
             services.AddSwaggerGen(options =>

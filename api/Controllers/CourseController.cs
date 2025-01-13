@@ -3,6 +3,7 @@ using api.Models.CampusCourse;
 using api.Models.CampusGroup;
 using api.Models.Notification;
 using api.Models.Student;
+using api.Models.Teacher;
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -102,5 +103,58 @@ namespace api.Controllers
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
             return Ok(await _courseService.EditStudentStatus(id, userId, studentId, editCourseStudentStatusModel));
         }
+
+        [HttpPost("courses/{id}/marks/{studentId}")]
+        [Authorize]
+        public async Task<IActionResult> EditStudentMark([FromRoute] Guid id, [FromRoute] Guid studentId, EditCourseStudentMarkModel editCourseStudentMarkModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.EditStudentMark(id, userId, studentId, editCourseStudentMarkModel));
+        }
+
+        [HttpPost("courses/{id}/teachers")]
+        [Authorize]
+        public async Task<IActionResult> AddTeacherToCourse([FromRoute] Guid id, AddTeacherToCourseModel addTeacherToCourseModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.AddTeacherToCourse(id, userId, addTeacherToCourseModel));
+        }
+
+        [HttpGet("courses/my")]
+        public async Task<IActionResult> GetMyCourses()
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.GetMyCourses(userId));
+        }
+
+        [HttpGet("courses/teaching")]
+        public async Task<IActionResult> GetTeachingCourses()
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.GetTeachingCourses(userId));
+        }
+
+        /*[HttpPut("courses/{id}")]
+        [Authorize]
+        public async Task<IActionResult> EditCourse([FromRoute] Guid id, EditCampusCourseModel editCampusCourseModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.EditCourse(id, userId, editCampusCourseModel));
+        }*/
     }
 }

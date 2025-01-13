@@ -18,7 +18,6 @@ namespace api.Mappers
                 Name = createCampusCourseModel.Name,
                 StartYear = createCampusCourseModel.StartYear,
                 MaximumStudentsCount = createCampusCourseModel.MaximumStudentsCount,
-                //RemainingSlotsCount = createCampusCourseModel.MaximumStudentsCount,
                 Requirements = createCampusCourseModel.Requirements,
                 Annotation = createCampusCourseModel.Annotations,
                 Semester = createCampusCourseModel.Semester,
@@ -75,6 +74,22 @@ namespace api.Mappers
                     Text = notification.Text,
                     IsImportant = notification.isImportant
                 }).ToList()
+            };
+        }
+
+        public static CampusCourse MapFromEditCampusCourseModelToCampusCourse(Guid courseId, EditCampusCourseModel editCampusCourseModel)
+        {
+            return new CampusCourse
+            {
+                Id = courseId,
+                Name = editCampusCourseModel.Name,
+                StartYear = editCampusCourseModel.StartYear,
+                MaximumStudentsCount = editCampusCourseModel.MaximumStudentsCount,
+                Requirements = editCampusCourseModel.Requirements,
+                Annotation = editCampusCourseModel.Annotations,
+                Semester = editCampusCourseModel.Semester,
+                Status = CourseStatuses.Created
+
             };
         }
     }
