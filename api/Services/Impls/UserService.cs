@@ -30,5 +30,18 @@ namespace api.Services.Impls
             return users;
         }
 
+        public async Task<UserRolesModel> GetRoles(string token)
+        {
+            var user = await _accountService.GetUserByToken(token);
+            var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
+            var student = await _db.Students.FirstOrDefaultAsync(s => s.UserId == user.Id);
+            var teacher = await _db.Teachers.FirstOrDefaultAsync(t => t.UserId == user.Id);
+            var roles = new UserRolesModel();
+            if (role.IsAdmin) roles.IsAdmin = true;
+            if (!(student == null)) roles.IsStudent = true;
+            if (!(teacher == null)) roles.IsTeacher = true;
+            return roles;
+        }
+
     }
 }

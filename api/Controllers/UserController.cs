@@ -27,5 +27,14 @@ namespace api.Controllers
             var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
             return Ok(await _userService.GetUsers(token));
         }
+
+        [Authorize]
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            return Ok(await _userService.GetRoles(token));
+        }
     }
 }

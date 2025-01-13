@@ -241,30 +241,5 @@ namespace api.Services.Impls
             return coursePreviews;
         }
 
-        /*public async Task<CampusCourseDetailsModel> EditCourse(Guid courseId, string userId, EditCampusCourseModel editCampusCourseModel)
-        {
-            Console.WriteLine("1 step");
-            var user = await _accountService.GetUserById(userId);
-
-            if (editCampusCourseModel == null) throw new BadRequestException(ErrorConstants.EmtyBodyError);
-            Console.WriteLine("2 step");
-            Console.WriteLine("3 step");
-            var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
-            if (role == null || !role.IsAdmin) throw new ForbiddenException(ErrorConstants.ForbiddenError);
-            Console.WriteLine("4 step");
-            var updateCourse = CourseMapper.MapFromEditCampusCourseModelToCampusCourse(courseId, editCampusCourseModel);
-            Console.WriteLine("5 step");
-            var mainTeacher = await _db.Users.FirstOrDefaultAsync(u => u.Id == editCampusCourseModel.MainTeacherId);
-            if (mainTeacher == null)
-            {
-                throw new NotFoundException($"Teacher with ID {editCampusCourseModel.MainTeacherId} not found.");
-            }
-            Console.WriteLine("6 step");
-            var courseTeacher = CourseTeacherMapper.MapUserToTeacher(mainTeacher, updateCourse);
-            _db.Courses.Update(updateCourse);
-            await _db.Teachers.AddAsync(courseTeacher);
-            await _db.SaveChangesAsync();
-            return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(updateCourse);
-        }*/
     }
 }
