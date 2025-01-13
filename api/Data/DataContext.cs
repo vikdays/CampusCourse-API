@@ -34,12 +34,14 @@ public class DataContext : DbContext
         modelBuilder.Entity<CampusCourseStudent>()
             .HasOne(cs => cs.CampusCourse)
             .WithMany(c => c.Students)
-            .HasForeignKey(cs => cs.CampusCourseId);
+            .HasForeignKey(cs => cs.CampusCourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CampusCourseStudent>()
             .HasOne(cs => cs.User)
             .WithMany()
-            .HasForeignKey(cs => cs.UserId);
+            .HasForeignKey(cs => cs.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CampusCourseTeacher>()
             .HasKey(ct => new { ct.UserId, ct.CampusCourseId });
@@ -47,12 +49,14 @@ public class DataContext : DbContext
         modelBuilder.Entity<CampusCourseTeacher>()
             .HasOne(ct => ct.CampusCourse)
             .WithMany(c => c.Teachers)
-            .HasForeignKey(ct => ct.CampusCourseId);
+            .HasForeignKey(ct => ct.CampusCourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CampusCourseTeacher>()
             .HasOne(ct => ct.User)
             .WithMany()
-            .HasForeignKey(ct => ct.UserId);
+            .HasForeignKey(ct => ct.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Notification>()
             .HasOne(n => n.CampusCourse)

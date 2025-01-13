@@ -10,8 +10,6 @@ namespace api.Mappers
             {
                 UserId = user.Id,
                 CampusCourseId = campusCourse.Id,
-                Name = user.Name,
-                Email = user.Email,
                 IsMain = true
             };
         }

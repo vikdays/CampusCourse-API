@@ -18,7 +18,7 @@ namespace api.Mappers
                 Name = createCampusCourseModel.Name,
                 StartYear = createCampusCourseModel.StartYear,
                 MaximumStudentsCount = createCampusCourseModel.MaximumStudentsCount,
-                RemainingSlotsCount = createCampusCourseModel.MaximumStudentsCount,
+                //RemainingSlotsCount = createCampusCourseModel.MaximumStudentsCount,
                 Requirements = createCampusCourseModel.Requirements,
                 Annotation = createCampusCourseModel.Annotations,
                 Semester = createCampusCourseModel.Semester,
@@ -35,7 +35,7 @@ namespace api.Mappers
                 Name = campusCourse.Name,
                 StartYear = campusCourse.StartYear,
                 MaximumStudentsCount = campusCourse.MaximumStudentsCount,
-                RemainingSlotsCount = campusCourse.RemainingSlotsCount,
+                RemainingSlotsCount = campusCourse.MaximumStudentsCount - campusCourse.Students.Count(s => s.Status == StudentStatuses.Accepted),
                 Semester = campusCourse.Semester,
                 Status = campusCourse.Status
 
@@ -50,7 +50,7 @@ namespace api.Mappers
                 StartYear = campusCourse.StartYear,
                 MaximumStudentsCount = campusCourse.MaximumStudentsCount,
                 StudentsInQueueCount = campusCourse.Students.Count(s => s.Status == StudentStatuses.InQueue),
-                StudentsEnrolledCount = campusCourse.MaximumStudentsCount - campusCourse.Students.Count(s => s.Status == StudentStatuses.Accepted),
+                StudentsEnrolledCount = campusCourse.Students.Count(s => s.Status == StudentStatuses.Accepted),
                 Requirements = campusCourse.Requirements,
                 Annotations = campusCourse.Annotation,
                 Semester = campusCourse.Semester,
@@ -58,16 +58,16 @@ namespace api.Mappers
                 Students = campusCourse.Students.Select(student => new CampusCourseStudentModel
                 {
                     Id = student.UserId,
-                    Name = student.Name,
-                    Email = student.Email,
+                    Name = student.User.Name,
+                    Email = student.User.Email,
                     Status = student.Status,
                     MidtermResult = student.MidtermResult,
                     FinalResult = student.FinalResult
                 }).ToList(),
                 Teachers = campusCourse.Teachers.Select(teacher => new CampusCourseTeacherModel
                 {
-                    Name = teacher.Name,
-                    Email = teacher.Email,
+                    Name = teacher.User.Name,
+                    Email = teacher.User.Email,
                     IsMain = teacher.IsMain
                 }).ToList(),
                 Notifications = campusCourse.Notifications.Select(notification => new CampusCourseNotificationModel

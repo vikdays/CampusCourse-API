@@ -1,4 +1,5 @@
-﻿using api.Exceptions;
+﻿using api.Entities;
+using api.Exceptions;
 using api.Mappers;
 using api.Models.CampusCourse;
 using api.Models.CampusGroup;
@@ -65,7 +66,7 @@ namespace api.Services.Impls
 
         public async Task SignUpToCourse(Guid courseId, string userId)
         {
-            var course = await _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var user = await _accountService.GetUserById(userId);
             var student = course.Students.FirstOrDefault(s => s.UserId == user.Id);
@@ -73,7 +74,7 @@ namespace api.Services.Impls
             { 
                 throw new BadRequestException(ErrorConstants.SignedUpError);
             }
-            if (!(course.Status == CourseStatuses.OpenForAssigning) || (course.RemainingSlotsCount == 0))
+            if (!(course.Status == CourseStatuses.OpenForAssigning) || ((course.MaximumStudentsCount - course.Students.Count(s => s.Status == StudentStatuses.Accepted)) == 0))
             {
                 throw new BadRequestException(ErrorConstants.ClosedCourse);
             }
@@ -89,7 +90,7 @@ namespace api.Services.Impls
                 throw new BadRequestException(ErrorConstants.EmtyBodyError);
             }
             var user = await _accountService.GetUserById(userId);
-            var course = await _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == id);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == id);
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);
@@ -110,7 +111,7 @@ namespace api.Services.Impls
                 throw new BadRequestException(ErrorConstants.EmtyBodyError);
             }
             var user = await _accountService.GetUserById(userId);
-            var course = await _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == id);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == id);
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);
@@ -139,7 +140,7 @@ namespace api.Services.Impls
                 throw new BadRequestException(ErrorConstants.EmtyBodyError);
             }
             var user = await _accountService.GetUserById(userId);
-            var course = await _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
             var student = course.Students.FirstOrDefault(s => s.UserId == studentId);
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);

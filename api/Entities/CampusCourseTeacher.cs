@@ -6,17 +6,14 @@ namespace api.Entities
     [Table("Teachers")]
     public class CampusCourseTeacher
     {
-        [Key] public Guid UserId { get; set; }
-        public Guid CampusCourseId { get; set; } 
+        [ForeignKey(nameof(User))]
+        public Guid UserId { get; set; }
+        public User User { get; set; }
 
-        public string? Name { get; set; }
-
-        [EmailAddress(ErrorMessage = ErrorConstants.EmailNotValid)]
-        public string? Email { get; set; }
+        [ForeignKey(nameof(CampusCourse))]
+        public Guid CampusCourseId { get; set; }
+        public CampusCourse CampusCourse { get; set; }
 
         public bool IsMain { get; set; } = true;
-
-        public User User { get; set; } 
-        public CampusCourse CampusCourse { get; set; }
     }
 }
