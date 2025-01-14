@@ -311,5 +311,23 @@ namespace api.Services.Impls
             return coursePreviews;
         }
 
+        public async Task<CampusCourseDetailsModel> EditCourseInfo(Guid courseId, string userId, EditCampusCourseRequirementsAndAnnotationModel editCampusCourseRequirementsAndAnnotationModel)
+        {
+            var user = await _accountService.GetUserById(userId);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).ThenInclude(t => t.User).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            if (editCampusCourseRequirementsAndAnnotationModel == null) throw new BadRequestException(ErrorConstants.EmtyBodyError);
+
+            if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
+
+            var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
+            var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);
+            if (role == null || (!role.IsAdmin && teacher == null)) throw new ForbiddenException(ErrorConstants.ForbiddenError);
+
+            course.Annotation = editCampusCourseRequirementsAndAnnotationModel.Annotations;
+            course.Requirements = editCampusCourseRequirementsAndAnnotationModel.Requirements;
+            _db.Courses.Update(course);
+            await _db.SaveChangesAsync();
+            return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(course);
+        }
     }
 }

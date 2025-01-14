@@ -70,7 +70,6 @@ namespace api.Services.Impls
             {
                 throw new ForbiddenException(ErrorConstants.ForbiddenError);
             }
-            //var group = GroupMapper.MapFromEditCampusGroupModelToCampusGroup(editCampusGroupModel, groupId);
             existingGroup.Name = editCampusGroupModel.Name;
             _db.CampusGroups.Update(existingGroup);
             await _db.SaveChangesAsync();

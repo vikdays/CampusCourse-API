@@ -127,19 +127,36 @@ namespace api.Controllers
         }
 
         [HttpGet("courses/my")]
+        [Authorize]
         public async Task<IActionResult> GetMyCourses()
         {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
             return Ok(await _courseService.GetMyCourses(userId));
         }
 
         [HttpGet("courses/teaching")]
+        [Authorize]
         public async Task<IActionResult> GetTeachingCourses()
         {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
             return Ok(await _courseService.GetTeachingCourses(userId));
         }
-        
 
+        [HttpPut("courses/{id}/requirements-and-annotations")]
+        [Authorize]
+        public async Task<IActionResult> EditCourseInfo([FromRoute] Guid id, EditCampusCourseRequirementsAndAnnotationModel editCampusCourseRequirementsAndAnnotationModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.EditCourseInfo(id, userId, editCampusCourseRequirementsAndAnnotationModel));
+        }
     }
 }

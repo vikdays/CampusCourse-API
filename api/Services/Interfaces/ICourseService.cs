@@ -16,6 +16,7 @@ namespace api.Services.Interfaces
         public Task<CampusCourseDetailsModel> EditStudentStatus(Guid courseId, string userId, Guid studentId, EditCourseStudentStatusModel editCourseStudentStatusModel);
         public Task<CampusCourseDetailsModel> EditStudentMark(Guid courseId, string userId, Guid studentId, EditCourseStudentMarkModel editCourseStudentMarkModel);
         public Task<CampusCourseDetailsModel> AddTeacherToCourse(Guid courseId, string userId, AddTeacherToCourseModel addTeacherToCourseModel);
+        public Task<CampusCourseDetailsModel> EditCourseInfo(Guid courseId, string userId, EditCampusCourseRequirementsAndAnnotationModel editCampusCourseRequirementsAndAnnotationModel);
         public Task<List<CampusCoursePreviewModel>> GetMyCourses(string userId);
         public Task<List<CampusCoursePreviewModel>> GetTeachingCourses(string userId);
         //public Task<CampusCourseDetailsModel> EditCourse(Guid courseId, string userId, EditCampusCourseModel editCampusCourseModel);
