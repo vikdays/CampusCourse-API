@@ -62,14 +62,19 @@ namespace api.Services.Impls
         {
             var user = await _accountService.GetUserByToken(token);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
+            var existingGroup = await _db.CampusGroups.FirstOrDefaultAsync(g => g.Id == groupId);
+
+            if (existingGroup == null) throw new NotFoundException(ErrorConstants.NotFoundGroupError); 
+            
             if (role == null || !role.IsAdmin)
             {
                 throw new ForbiddenException(ErrorConstants.ForbiddenError);
             }
-            var group = GroupMapper.MapFromEditCampusGroupModelToCampusGroup(editCampusGroupModel, groupId);
-            _db.CampusGroups.Update(group);
+            //var group = GroupMapper.MapFromEditCampusGroupModelToCampusGroup(editCampusGroupModel, groupId);
+            existingGroup.Name = editCampusGroupModel.Name;
+            _db.CampusGroups.Update(existingGroup);
             await _db.SaveChangesAsync();
-            return GroupMapper.MapFromCampusGroupToCampusGroupModel(group);
+            return GroupMapper.MapFromCampusGroupToCampusGroupModel(existingGroup);
         }
 
         public async Task DeleteCampusGroup(Guid id, string userId)

@@ -71,7 +71,7 @@ namespace api.Services.Impls
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var user = await _accountService.GetUserById(userId);
             var student = course.Students.FirstOrDefault(s => s.UserId == user.Id);
-            var teacher = course.Teachers.FirstOrDefault(s => s.CampusCourseId == courseId);
+            var teacher = course.Teachers.FirstOrDefault(s => s.UserId == user.Id);
             if (!(student == null)) throw new BadRequestException(ErrorConstants.SignedUpError);
             if (!(teacher == null)) throw new BadRequestException(ErrorConstants.TeacherSignUpError);
             if (!(course.Status == CourseStatuses.OpenForAssigning) || ((course.MaximumStudentsCount - course.Students.Count(s => s.Status == StudentStatuses.Accepted)) == 0))
@@ -140,9 +140,79 @@ namespace api.Services.Impls
         public async Task<CampusCourseDetailsModel> GetCourseDetails(Guid courseId, string userId)
         {
             var user = await _accountService.GetUserById(userId);
-            var course = await _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).ThenInclude(t => t.User).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
             if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
-            return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(course);
+            var isAdmin = (await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id))?.IsAdmin ?? false;
+            var isTeacher = course.Teachers.Any(t => t.UserId == user.Id);
+            var isStudent = course.Students.Any(s => s.UserId == user.Id);
+            List<CampusCourseStudentModel> students;
+
+            if (isAdmin || isTeacher)
+            {
+                students = course.Students.Select(s => new CampusCourseStudentModel
+                {
+                    Id = s.UserId,
+                    Name = s.User.Name,
+                    Email = s.User.Email,
+                    Status = s.Status,
+                    MidtermResult = s.MidtermResult,
+                    FinalResult = s.FinalResult
+                }).ToList();
+            }
+            else if (isStudent)
+            {
+                students = course.Students
+                    .Where(s => s.Status == StudentStatuses.Accepted)
+                    .Select(s => new CampusCourseStudentModel
+                    {
+                        Id = s.UserId,
+                        Name = s.User.Name,
+                        Email = s.User.Email,
+                        Status = s.Status,
+                        MidtermResult = s.UserId == user.Id ? s.MidtermResult : StudentMarks.NotDefined,
+                        FinalResult = s.UserId == user.Id ? s.FinalResult : StudentMarks.NotDefined
+                    }).ToList();
+            }
+            else
+            {
+                students = course.Students
+                    .Where(s => s.Status == StudentStatuses.Accepted)
+                    .Select(s => new CampusCourseStudentModel
+                    {
+                        Id = s.UserId,
+                        Name = s.User.Name,
+                        Email = s.User.Email,
+                        Status = s.Status,
+                        MidtermResult = StudentMarks.NotDefined,
+                        FinalResult = StudentMarks.NotDefined
+                    }).ToList();
+            }
+            var courseDetails = new CampusCourseDetailsModel
+            {
+                Id = course.Id,
+                Name = course.Name,
+                StartYear = course.StartYear,
+                MaximumStudentsCount = course.MaximumStudentsCount,
+                StudentsInQueueCount = course.Students.Count(s => s.Status == StudentStatuses.InQueue),
+                StudentsEnrolledCount = course.Students.Count(s => s.Status == StudentStatuses.Accepted),
+                Requirements = course.Requirements,
+                Annotations = course.Annotation,
+                Semester = course.Semester,
+                Status = course.Status,
+                Students = students,
+                Teachers = course.Teachers.Select(teacher => new CampusCourseTeacherModel
+                {
+                    Name = teacher.User.Name,
+                    Email = teacher.User.Email,
+                    IsMain = teacher.IsMain
+                }).ToList(),
+                Notifications = course.Notifications.Select(notification => new CampusCourseNotificationModel
+                {
+                    Text = notification.Text,
+                    IsImportant = notification.isImportant
+                }).ToList()
+            };
+            return courseDetails;
         }
 
         public async Task<CampusCourseDetailsModel> EditStudentStatus(Guid courseId, string userId, Guid studentId, EditCourseStudentStatusModel editCourseStudentStatusModel)
