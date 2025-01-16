@@ -28,8 +28,5 @@ namespace api.Models.CampusCourse
         [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
         [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.PasswordLengthError)]
         public string Annotations { get; set; }
-
-        [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-        public Guid MainTeacherId { get; set; }
     }
 }

@@ -12,7 +12,6 @@ namespace api.Entities
         public string Name { get; set; }
         public int StartYear { get; set; }
         public int MaximumStudentsCount { get; set; }
-        //public int RemainingSlotsCount { get; set; } 
         public string Requirements { get; set; }
         public string Annotation { get; set; }
 

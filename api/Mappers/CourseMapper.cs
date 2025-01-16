@@ -77,21 +77,25 @@ namespace api.Mappers
             };
         }
 
-        public static CampusCourse MapFromEditCampusCourseModelToCampusCourse(Guid courseId, EditCampusCourseModel editCampusCourseModel)
+        public static CampusCourse MapFromEditCampusCourseModelToCampusCourse(Guid courseId, EditCampusCourseModel editCampusCourseModel, CampusCourse campusCourse)
         {
-            return new CampusCourse
+            
             {
-                Id = courseId,
-                Name = editCampusCourseModel.Name,
-                StartYear = editCampusCourseModel.StartYear,
-                MaximumStudentsCount = editCampusCourseModel.MaximumStudentsCount,
-                Requirements = editCampusCourseModel.Requirements,
-                Annotation = editCampusCourseModel.Annotations,
-                Semester = editCampusCourseModel.Semester,
-                Status = CourseStatuses.Created
+                campusCourse.Id = courseId;
+                campusCourse.Name = editCampusCourseModel.Name;
+                campusCourse.StartYear = editCampusCourseModel.StartYear;
+                campusCourse.MaximumStudentsCount = editCampusCourseModel.MaximumStudentsCount;
+                campusCourse.Requirements = editCampusCourseModel.Requirements;
+                campusCourse.Annotation = editCampusCourseModel.Annotations;
+                campusCourse.Semester = editCampusCourseModel.Semester;
+                campusCourse.Status = CourseStatuses.Created;
+                campusCourse.CampusGroupId = campusCourse.CampusGroupId;
 
             };
+            return campusCourse;
         }
+
+
     }
         
 }

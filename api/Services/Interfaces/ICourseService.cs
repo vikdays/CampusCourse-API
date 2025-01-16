@@ -1,7 +1,9 @@
 ﻿using api.Models.CampusCourse;
+using api.Models.Enums;
 using api.Models.Notification;
 using api.Models.Student;
 using api.Models.Teacher;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Services.Interfaces
 {
@@ -18,7 +20,8 @@ namespace api.Services.Interfaces
         public Task<CampusCourseDetailsModel> AddTeacherToCourse(Guid courseId, string userId, AddTeacherToCourseModel addTeacherToCourseModel);
         public Task<CampusCourseDetailsModel> EditCourseInfo(Guid courseId, string userId, EditCampusCourseRequirementsAndAnnotationModel editCampusCourseRequirementsAndAnnotationModel);
         public Task<List<CampusCoursePreviewModel>> GetMyCourses(string userId);
+        public Task<List<CampusCoursePreviewModel>> GetCourses(SortList? sort, string? search, bool hasPlaceAndOpen,Semesters? semester, int page, int pageSize);
         public Task<List<CampusCoursePreviewModel>> GetTeachingCourses(string userId);
-        //public Task<CampusCourseDetailsModel> EditCourse(Guid courseId, string userId, EditCampusCourseModel editCampusCourseModel);
+        public Task<CampusCourseDetailsModel> EditCourse(Guid courseId, string userId, EditCampusCourseModel editCampusCourseModel);
     }
 }

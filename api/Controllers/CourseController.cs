@@ -1,6 +1,7 @@
 ﻿using api.Exceptions;
 using api.Models.CampusCourse;
 using api.Models.CampusGroup;
+using api.Models.Enums;
 using api.Models.Notification;
 using api.Models.Student;
 using api.Models.Teacher;
@@ -126,6 +127,7 @@ namespace api.Controllers
             return Ok(await _courseService.AddTeacherToCourse(id, userId, addTeacherToCourseModel));
         }
 
+
         [HttpGet("courses/my")]
         [Authorize]
         public async Task<IActionResult> GetMyCourses()
@@ -157,6 +159,24 @@ namespace api.Controllers
             if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
             return Ok(await _courseService.EditCourseInfo(id, userId, editCampusCourseRequirementsAndAnnotationModel));
+        }
+
+        [HttpPut("courses/{id}/")]
+        [Authorize]
+        public async Task<IActionResult> EditCourse([FromRoute] Guid id, EditCampusCourseModel editCampusCourseModel)
+        {
+            var authorizationHeader = Request.Headers["Authorization"].ToString();
+            var token = _tokenService.ExtractTokenFromHeader(authorizationHeader);
+            if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return Ok(await _courseService.EditCourse(id, userId, editCampusCourseModel));
+        }
+
+        [HttpGet("courses/list")]
+        public async Task<IActionResult> GetCourses([FromQuery] bool hasPlaceAndOpen, [FromQuery] SortList? sort = null, [FromQuery] string? search = null,
+        [FromQuery] Semesters? semester = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            return Ok(await _courseService.GetCourses(sort, search, hasPlaceAndOpen, semester, page, pageSize));
         }
     }
 }

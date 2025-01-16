@@ -70,6 +70,7 @@ namespace api
             builder.Services.AddScoped<IGroupService, GroupService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
 
             services.AddSwaggerGen(options =>

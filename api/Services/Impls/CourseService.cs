@@ -10,6 +10,7 @@ using api.Models.Teacher;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace api.Services.Impls
 {
@@ -325,6 +326,74 @@ namespace api.Services.Impls
 
             course.Annotation = editCampusCourseRequirementsAndAnnotationModel.Annotations;
             course.Requirements = editCampusCourseRequirementsAndAnnotationModel.Requirements;
+            _db.Courses.Update(course);
+            await _db.SaveChangesAsync();
+            return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(course);
+        }
+
+        public async Task<List<CampusCoursePreviewModel>> GetCourses(SortList? sort, string? search, bool hasPlaceAndOpen, Semesters? semester, int page, int pageSize)
+        {
+
+            if (pageSize <= 0) throw new BadRequestException(ErrorConstants.SizeError);
+            if (page <= 0) throw new BadRequestException(ErrorConstants.PageError);
+            var courses = _db.Courses.Include(c => c.Students).Include(c => c.Teachers).Include(c => c.Notifications).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var lowerSearch = search.ToLower();
+                courses = courses.Where(c => c.Name.ToLower().Contains(lowerSearch));
+            }
+
+            if (hasPlaceAndOpen)
+            {
+                courses = courses.Where(c => c.Status == CourseStatuses.OpenForAssigning && (c.MaximumStudentsCount - c.Students.Count(s => s.Status == StudentStatuses.Accepted)) > 0);
+            }
+
+            if (semester.HasValue)
+            {
+                courses = courses.Where(c => c.Semester == semester.Value);
+            }
+            if (sort.HasValue)
+            {
+                switch (sort.Value)
+                {
+                    case SortList.CreateAsc:
+                        courses = courses.OrderBy(c => c.Name);
+                        break;
+                    case SortList.CreateDesc:
+                        courses = courses.OrderByDescending(c => c.Name);
+                        break;
+                    default:
+                        throw new BadRequestException(ErrorConstants.SortError);
+                }
+            }
+
+            var skip = (page - 1) * pageSize;
+            var coursesPage = await courses.Skip(skip).Take(pageSize).ToListAsync();
+            return coursesPage.Select(c => new CampusCoursePreviewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                StartYear = c.StartYear,
+                MaximumStudentsCount = c.MaximumStudentsCount,
+                RemainingSlotsCount = c.MaximumStudentsCount - c.Students.Count(s => s.Status == StudentStatuses.Accepted),
+                Status = c.Status,
+                Semester = c.Semester
+            }).ToList();
+        }
+
+        public async Task<CampusCourseDetailsModel> EditCourse(Guid courseId, string userId, EditCampusCourseModel editCampusCourseModel)
+        {
+            var user = await _accountService.GetUserById(userId);
+            var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).ThenInclude(t => t.User).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            if (editCampusCourseModel == null) throw new BadRequestException(ErrorConstants.EmtyBodyError);
+
+            if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
+
+            var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
+            if (role == null || !role.IsAdmin) throw new ForbiddenException(ErrorConstants.ForbiddenError);
+
+            course = CourseMapper.MapFromEditCampusCourseModelToCampusCourse(courseId, editCampusCourseModel, course);
             _db.Courses.Update(course);
             await _db.SaveChangesAsync();
             return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(course);
