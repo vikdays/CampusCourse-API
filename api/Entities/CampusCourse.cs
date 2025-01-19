@@ -8,12 +8,14 @@ namespace api.Entities
     public class CampusCourse
     {
         [Key] public Guid Id { get; set; }
-        public Guid CampusGroupId { get; set; } //внешний ключ
+        public Guid CampusGroupId { get; set; } 
         public string Name { get; set; }
         public int StartYear { get; set; }
         public int MaximumStudentsCount { get; set; }
         public string Requirements { get; set; }
         public string Annotation { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime? StartDate { get; set; }
 
         public Semesters Semester { get; set; }
 

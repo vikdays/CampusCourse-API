@@ -1,6 +1,6 @@
-﻿public class Response()
+﻿public class Response
 {
-    public Response(string status, string message) : this()
+    public Response(string status, string message) 
     {
         Status = status;
         Message = message;

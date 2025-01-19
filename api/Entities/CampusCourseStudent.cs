@@ -17,8 +17,8 @@ namespace api.Entities
 
         public StudentStatuses Status { get; set; }
 
-        public StudentMarks MidtermResult { get; set; }
+        public StudentMarks? MidtermResult { get; set; }
 
-        public StudentMarks FinalResult { get; set; }
+        public StudentMarks? FinalResult { get; set; }
     }
 }

@@ -75,7 +75,7 @@ namespace api.Services.Impls
             var teacher = course.Teachers.FirstOrDefault(s => s.UserId == user.Id);
             if (!(student == null)) throw new BadRequestException(ErrorConstants.SignedUpError);
             if (!(teacher == null)) throw new BadRequestException(ErrorConstants.TeacherSignUpError);
-            if (!(course.Status == CourseStatuses.OpenForAssigning) || ((course.MaximumStudentsCount - course.Students.Count(s => s.Status == StudentStatuses.Accepted)) == 0))
+            if (!(course.Status == CourseStatuses.OpenForAssigning))
             {
                 throw new BadRequestException(ErrorConstants.ClosedCourse);
             }
@@ -156,8 +156,8 @@ namespace api.Services.Impls
                     Name = s.User.Name,
                     Email = s.User.Email,
                     Status = s.Status,
-                    MidtermResult = s.MidtermResult,
-                    FinalResult = s.FinalResult
+                    MidtermResult =  s.MidtermResult,
+                    FinalResult =  s.FinalResult,
                 }).ToList();
             }
             else if (isStudent)
@@ -170,8 +170,8 @@ namespace api.Services.Impls
                         Name = s.User.Name,
                         Email = s.User.Email,
                         Status = s.Status,
-                        MidtermResult = s.UserId == user.Id ? s.MidtermResult : StudentMarks.NotDefined,
-                        FinalResult = s.UserId == user.Id ? s.FinalResult : StudentMarks.NotDefined
+                        MidtermResult = s.UserId == user.Id ? s.MidtermResult : null,
+                        FinalResult = s.UserId == user.Id ? s.FinalResult : null
                     }).ToList();
             }
             else
@@ -184,8 +184,8 @@ namespace api.Services.Impls
                         Name = s.User.Name,
                         Email = s.User.Email,
                         Status = s.Status,
-                        MidtermResult = StudentMarks.NotDefined,
-                        FinalResult = StudentMarks.NotDefined
+                        MidtermResult = null,
+                        FinalResult = null
                     }).ToList();
             }
             var courseDetails = new CampusCourseDetailsModel
@@ -231,10 +231,21 @@ namespace api.Services.Impls
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);
             if (role == null || (!role.IsAdmin && teacher == null)) throw new ForbiddenException(ErrorConstants.ForbiddenError);
-
-            student.Status = editCourseStudentStatusModel.Status;
-            _db.Students.Update(student);
-            await _db.SaveChangesAsync();
+            if  ((course.MaximumStudentsCount - course.Students.Count(s => s.Status == StudentStatuses.Accepted)) > 0)
+            {
+                student.Status = editCourseStudentStatusModel.Status;
+                if (student.Status == StudentStatuses.Accepted)
+                {
+                    student.MidtermResult = StudentMarks.NotDefined;
+                    student.FinalResult = StudentMarks.NotDefined;
+                }
+                _db.Students.Update(student);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                throw new BadRequestException(ErrorConstants.MaximumStudentError);
+            }
             return CourseMapper.MapFromCampusCourseToCampusCourseDetailsModel(course);
         }
 
@@ -358,10 +369,10 @@ namespace api.Services.Impls
                 switch (sort.Value)
                 {
                     case SortList.CreateAsc:
-                        courses = courses.OrderBy(c => c.Name);
+                        courses = courses.OrderBy(c => c.CreateTime);
                         break;
                     case SortList.CreateDesc:
-                        courses = courses.OrderByDescending(c => c.Name);
+                        courses = courses.OrderByDescending(c => c.CreateTime);
                         break;
                     default:
                         throw new BadRequestException(ErrorConstants.SortError);

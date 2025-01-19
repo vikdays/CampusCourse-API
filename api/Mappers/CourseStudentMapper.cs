@@ -11,7 +11,9 @@ namespace api.Mappers
             {
                 UserId = user.Id,
                 CampusCourseId = campusCourse.Id,
-                Status = StudentStatuses.InQueue
+                Status = StudentStatuses.InQueue,
+                MidtermResult = null,
+                FinalResult = null,
             };
         }
     }

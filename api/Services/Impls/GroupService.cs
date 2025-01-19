@@ -95,13 +95,7 @@ namespace api.Services.Impls
             var user = await _accountService.GetUserById(userId);
             var group = await _db.CampusGroups.FindAsync(groupId);
             if (group == null) throw new NotFoundException(ErrorConstants.NotFoundGroupError);
-            var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
-            if (role == null || !role.IsAdmin)
-            {
-                throw new ForbiddenException(ErrorConstants.ForbiddenError);
-            }
-            var course = await _db.Courses.FirstOrDefaultAsync(c => c.CampusGroupId == groupId);
-            var courses = _db.Courses.Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToList();
+            var courses = await _db.Courses.Where(c => c.CampusGroupId == groupId).Include(c => c.Students).Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToListAsync();
             return courses;
         }
     }

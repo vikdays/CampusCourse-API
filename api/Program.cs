@@ -1,7 +1,10 @@
 
 using api.Middleware;
+using api.Services;
 using api.Services.Impls;
 using api.Services.Interfaces;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +30,10 @@ namespace api
             services.AddHttpContextAccessor();
             services.AddDbContext<DataContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddHangfire(config =>
+    config.UsePostgreSqlStorage(configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddHangfireServer();
+
 
             JwtOptions jwtOptions = new();
             configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
@@ -71,6 +78,7 @@ namespace api
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IReportService, ReportService>();
+            builder.Services.AddScoped<TokenCleanUpService>();
 
 
             services.AddSwaggerGen(options =>
@@ -106,6 +114,13 @@ namespace api
 
 
             var app = builder.Build();
+
+            app.UseHangfireDashboard();
+
+            RecurringJob.AddOrUpdate<TokenCleanUpService>(
+                service => service.CleanupExpiredTokensAsync(),
+                Cron.Daily);
+
 
 
             // Configure the HTTP request pipeline.

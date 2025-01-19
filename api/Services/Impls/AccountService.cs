@@ -2,6 +2,7 @@
 using api.Exceptions;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Crypto.Generators;
 using System.Numerics;
 
@@ -9,10 +10,12 @@ public class AccountService : IAccountService
 {
     private readonly DataContext _db;
     private readonly ITokenService _tokenService;
-    public AccountService(DataContext db, ITokenService tokenService)
+    private readonly JwtOptions _jwtOptions;
+    public AccountService(DataContext db, ITokenService tokenService, IOptions<JwtOptions> options)
     {
         _db = db;
         _tokenService = tokenService;
+        _jwtOptions = options.Value;
     }
     public async Task<TokenResponse> Register(UserRegisterModel userRegisterModel)
     {
@@ -67,7 +70,8 @@ public class AccountService : IAccountService
     {
         token = _tokenService.ExtractTokenFromHeader(token);
         if (await _tokenService.IsTokenBanned(token)) throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
-        _db.BannedTokens.Add(new TokenEntity { Token = token });
+        var tokenExpiresAt = DateTime.UtcNow.AddHours(_jwtOptions.ExpiresHours); 
+        _db.BannedTokens.Add(new TokenEntity { Token = token, ExpiresAt = tokenExpiresAt });
         await _db.SaveChangesAsync();
         return await Task.FromResult(new Response(null, "Logout successful"));
     }

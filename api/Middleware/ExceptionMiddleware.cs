@@ -65,7 +65,7 @@ namespace api.Middleware
             return context.Response.WriteAsync(new
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = "An unexpected error occurred"
+                Message = exception?.Message
             }.ToString() ?? throw new InvalidOperationException());
         }
     }

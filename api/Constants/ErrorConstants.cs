@@ -28,6 +28,7 @@
     public const string PageError = "Invalid page value.";
     public const string SortError = "Invalid sort value.";
     public const string NoFoundMatchesError = "No courses were found matching the provided filters.";
+    public const string MaximumStudentError = "Maximum student count reached.";
 
 
     public const string ProfileAlreadyExistsError = "Profile already exist";

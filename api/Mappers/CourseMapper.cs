@@ -21,8 +21,9 @@ namespace api.Mappers
                 Requirements = createCampusCourseModel.Requirements,
                 Annotation = createCampusCourseModel.Annotations,
                 Semester = createCampusCourseModel.Semester,
-                Status = CourseStatuses.Created
-
+                Status = CourseStatuses.Created,
+                CreateTime = DateTime.UtcNow,
+                StartDate = createCampusCourseModel.Semester == Semesters.Spring? new DateTime(createCampusCourseModel.StartYear, 3, 1) : new DateTime(createCampusCourseModel.StartYear, 9, 1)
             };
         }
 
@@ -90,7 +91,8 @@ namespace api.Mappers
                 campusCourse.Semester = editCampusCourseModel.Semester;
                 campusCourse.Status = CourseStatuses.Created;
                 campusCourse.CampusGroupId = campusCourse.CampusGroupId;
-
+                campusCourse.CreateTime = campusCourse.CreateTime;
+                campusCourse.StartDate = campusCourse.Semester == Semesters.Spring ? new DateTime(campusCourse.StartYear, 3, 1) : new DateTime(campusCourse.StartYear, 9, 1);
             };
             return campusCourse;
         }

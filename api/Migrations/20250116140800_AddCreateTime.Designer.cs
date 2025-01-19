@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250116140800_AddCreateTime")]
+    partial class AddCreateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,9 +114,6 @@ namespace api.Migrations
                     b.Property<int>("Semester")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("StartYear")
                         .HasColumnType("integer");
 
@@ -135,10 +135,10 @@ namespace api.Migrations
                     b.Property<Guid>("CampusCourseId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("FinalResult")
+                    b.Property<int>("FinalResult")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("MidtermResult")
+                    b.Property<int>("MidtermResult")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
