@@ -23,7 +23,9 @@ namespace api.Mappers
                 Semester = createCampusCourseModel.Semester,
                 Status = CourseStatuses.Created,
                 CreateTime = DateTime.UtcNow,
-                StartDate = createCampusCourseModel.Semester == Semesters.Spring? new DateTime(createCampusCourseModel.StartYear, 3, 1) : new DateTime(createCampusCourseModel.StartYear, 9, 1)
+                StartDate = createCampusCourseModel.Semester == Semesters.Spring
+            ? DateTime.SpecifyKind(new DateTime(createCampusCourseModel.StartYear, 3, 1), DateTimeKind.Utc)
+            : DateTime.SpecifyKind(new DateTime(createCampusCourseModel.StartYear, 9, 1), DateTimeKind.Utc)
             };
         }
 

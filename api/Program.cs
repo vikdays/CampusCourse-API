@@ -1,6 +1,7 @@
 
 using api.Middleware;
 using api.Services;
+using api.Services.Email;
 using api.Services.Impls;
 using api.Services.Interfaces;
 using Hangfire;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -25,7 +27,6 @@ namespace api
 
             services.AddControllers();
 
-
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
             services.AddHttpContextAccessor();
             services.AddDbContext<DataContext>(options =>
@@ -33,6 +34,18 @@ namespace api
             builder.Services.AddHangfire(config =>
     config.UsePostgreSqlStorage(configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddHangfireServer();
+            builder.Services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var jobKey = new JobKey("EmailNotificationJob");
+                q.AddJob<EmailNotificationJob>(opts => opts.WithIdentity(jobKey));
+
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("EmailNotificationJob-trigger")
+                    .WithCronSchedule("0 0 7 * * ?"));
+            });
+            builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
             JwtOptions jwtOptions = new();
@@ -79,6 +92,7 @@ namespace api
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<TokenCleanUpService>();
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
             services.AddSwaggerGen(options =>
@@ -135,7 +149,6 @@ namespace api
 
             app.MapControllers();
             app.UseMiddleware<ExceptionMiddleware>();
-
             app.Run();
         }
     }
