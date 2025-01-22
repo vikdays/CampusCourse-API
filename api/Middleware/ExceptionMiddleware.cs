@@ -5,12 +5,10 @@ namespace api.Middleware
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
-            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -35,6 +33,10 @@ namespace api.Middleware
             {
                 await HandleCustomExceptionAsync(context, notFoundEx);
             }
+            catch (ConflictException conflictEx)
+            {
+                await HandleCustomExceptionAsync(context, conflictEx);
+            }
             catch (InternalServerErrorException internalServerEx)
             {
                 await HandleCustomExceptionAsync(context, internalServerEx);
@@ -44,17 +46,14 @@ namespace api.Middleware
                 await HandleExceptionsAsync(context, ex);
             }
         }
-
         private static Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = exception.StatusCode;
 
-            return context.Response.WriteAsync(new
-            {
-                StatusCode = exception.StatusCode,
-                Message = exception.Message
-            }.ToString() ?? throw new InvalidOperationException());
+            var response = new Response(exception.StatusCode.ToString(), exception.Message);
+
+            return context.Response.WriteAsJsonAsync(response);
         }
 
         private static Task HandleExceptionsAsync(HttpContext context, Exception exception)
@@ -62,11 +61,10 @@ namespace api.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            return context.Response.WriteAsync(new
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-                Message = exception?.Message
-            }.ToString() ?? throw new InvalidOperationException());
+            var response = new Response("500", exception?.Message ?? "An unexpected error occurred");
+
+            return context.Response.WriteAsJsonAsync(response);
         }
+       
     }
 }

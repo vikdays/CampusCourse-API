@@ -3,9 +3,6 @@ using api.Exceptions;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Crypto.Generators;
-using System.Numerics;
-
 public class AccountService : IAccountService
 {
     private readonly DataContext _db;
@@ -21,7 +18,7 @@ public class AccountService : IAccountService
     {
         if (await _db.Users.FirstOrDefaultAsync(user => user.Email == userRegisterModel.Email) is not null)
         {
-            throw new BadRequestException(ErrorConstants.ProfileAlreadyExistsError);
+            throw new ConflictException(ErrorConstants.ProfileAlreadyExistsError);
         }
         if (userRegisterModel.Password != userRegisterModel.ConfirmPassword)
         {
@@ -29,12 +26,11 @@ public class AccountService : IAccountService
         }
         if (userRegisterModel.BirthDate > DateTime.UtcNow)
         {
-            throw new BadRequestException("Date of birth cannot be in the future.");
+            throw new BadRequestException(ErrorConstants.BirthDateError);
         }
-        //var hashedPassword = passwordHasher.Generate(userModel.Password);
         var user = UserMapper.MapFromRegisterModelToEntity(userRegisterModel);
         user.Password = BCrypt.Net.BCrypt.HashPassword(userRegisterModel.Password);
-        Console.WriteLine(user);
+        
 
         await _db.Users.AddAsync(user);
         var role = new Role
@@ -125,13 +121,18 @@ public class AccountService : IAccountService
         {
             throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
-
+        if (userProfileModel.BirthDate > DateTime.UtcNow)
+        {
+            throw new BadRequestException(ErrorConstants.BirthDateError);
+        }
         if (await _tokenService.IsTokenBanned(token))
         {
             throw new UnauthorizedException(ErrorConstants.UnauthorizedError);
         }
         var user = await GetUserByToken(token);
         user = UserMapper.MapFromUserProfileModelToEntity(userProfileModel, user);
+        if (userProfileModel.BirthDate.HasValue)
+            user.BirthDate = DateTime.SpecifyKind(userProfileModel.BirthDate.Value, DateTimeKind.Utc);
         _db.Users.Update(user);
         await _db.SaveChangesAsync();
         return UserMapper.MapFromEntityToUserProfileModel(user);

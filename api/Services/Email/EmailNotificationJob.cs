@@ -1,9 +1,6 @@
 ﻿using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace api.Services.Email
 {
@@ -20,24 +17,40 @@ namespace api.Services.Email
 
         public async Task Execute(IJobExecutionContext context)
         {
-            
-            var tomorrow = DateTime.UtcNow.Date.AddDays(1);
-            var coursesWithStudents = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User)
-                .Where(c => c.StartDate.HasValue && c.StartDate.Value.Date == tomorrow)
-                .ToListAsync();
-
-            foreach (var course in coursesWithStudents)
+            try
             {
-                foreach (var student in course.Students)
-                {
-                    var subject = $"Курс {course.Name} начинается завтра!";
-                    var body = $"Здравствуйте, {student.User.Name}. Курс {course.Name} начинается завтра. Не забудьте подготовиться!";
+                var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+                var coursesWithStudents = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User)
+                    .Where(c => c.StartDate.HasValue && c.StartDate.Value.Date == tomorrow)
+                    .ToListAsync();
 
-                    await _emailSender.SendEmail(student.User.Email, subject, body);
+                foreach (var course in coursesWithStudents)
+                {
+                    foreach (var student in course.Students.Where(s => !s.IsSent))
+                    {
+                        try
+                        {
+                            var subject = $"Курс {course.Name} начинается завтра!";
+                            var body = $"Здравствуйте, {student.User.Name}. Курс {course.Name} начинается завтра. Не забудьте подготовиться!";
+
+                            await _emailSender.SendEmail(student.User.Email, subject, body);
+
+                            student.IsSent = true;
+                            Console.WriteLine($"Email sent to {student.User.Email} successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error sending email to {student.User.Email}: {ex.Message}");
+                        }
+                    }
                 }
-                
+                await _db.SaveChangesAsync();
             }
-           
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in job execution: {ex.Message}");
+                throw new JobExecutionException(ex, refireImmediately: true);
+            }
         }
     }
 }

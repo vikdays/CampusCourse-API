@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
+using Quartz.Impl.Matchers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -43,7 +44,7 @@ namespace api
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
                     .WithIdentity("EmailNotificationJob-trigger")
-                    .WithCronSchedule("0 0 7 * * ?"));
+                    .WithCronSchedule("0 0 5 * * ?"));
             });
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 

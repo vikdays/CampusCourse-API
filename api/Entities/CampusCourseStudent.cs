@@ -20,5 +20,7 @@ namespace api.Entities
         public StudentMarks? MidtermResult { get; set; }
 
         public StudentMarks? FinalResult { get; set; }
+
+        public bool IsSent { get; set; }
     }
 }

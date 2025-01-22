@@ -34,6 +34,12 @@
             : base(message, 404) { }
     }
 
+    public class ConflictException : CustomException
+    {
+        public ConflictException(string message)
+            : base(message, 409) { }
+    }
+
     public class InternalServerErrorException : CustomException
     {
         public InternalServerErrorException(string message)

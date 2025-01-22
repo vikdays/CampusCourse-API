@@ -48,7 +48,7 @@ namespace api.Services.Impls
             await _db.Courses.AddAsync(course);
             await _db.Teachers.AddAsync(courseTeacher);
             await _db.SaveChangesAsync();
-            var courses = _db.Courses.Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToList();
+            var courses = await _db.Courses.Where(c => c.CampusGroupId == groupId).Include(c => c.Students).Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToListAsync();
             return courses;
         }
 
@@ -262,7 +262,10 @@ namespace api.Services.Impls
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);
             if (role == null || (!role.IsAdmin && teacher == null)) throw new ForbiddenException(ErrorConstants.ForbiddenError);
-
+            if (student.Status == StudentStatuses.Declined)
+                throw new BadRequestException(ErrorConstants.DeclinedError);
+            if (student.Status == StudentStatuses.InQueue)
+                throw new BadRequestException(ErrorConstants.InQueueError);
             if (editCourseStudentMarkModel.MarkType == MarkType.Midterm)
             {
                 student.MidtermResult = editCourseStudentMarkModel.Marks;
@@ -404,6 +407,11 @@ namespace api.Services.Impls
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             if (role == null || !role.IsAdmin) throw new ForbiddenException(ErrorConstants.ForbiddenError);
 
+            var enrolledStudentsCount = course.Students.Count(s => s.Status == StudentStatuses.Accepted);
+            if (editCampusCourseModel.MaximumStudentsCount < enrolledStudentsCount)
+            {
+                throw new ConflictException($"Maximum students count cannot be less than the number of enrolled students ({enrolledStudentsCount}).");
+            }
             course = CourseMapper.MapFromEditCampusCourseModelToCampusCourse(courseId, editCampusCourseModel, course);
             _db.Courses.Update(course);
             await _db.SaveChangesAsync();

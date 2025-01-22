@@ -29,9 +29,12 @@
     public const string SortError = "Invalid sort value.";
     public const string NoFoundMatchesError = "No courses were found matching the provided filters.";
     public const string MaximumStudentError = "Maximum student count reached.";
+    public const string BirthDateError = "Birth date cannot be in the future";
+    public const string DeclinedError = "Cannot edit marks for students with status 'Declined'.";
+    public const string InQueueError = "Cannot edit marks for students with status 'InQueue'.";
 
 
-    public const string ProfileAlreadyExistsError = "Profile already exist";
+    public const string ProfileAlreadyExistsError = "User with this email is already registered.";
     public const string ProfileNotExistsError = "Profile not exist";
     public const string PasswordNotExistsError = "Password not exists";
     public const string EmailNotValid = "Email not valid";
