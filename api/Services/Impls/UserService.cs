@@ -22,10 +22,10 @@ namespace api.Services.Impls
         {
             var user = await _accountService.GetUserByToken(token);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
-            if (role == null || !role.IsAdmin)
-            {
-                throw new ForbiddenException(ErrorConstants.ForbiddenError);
-            }
+            var mainTeacher = _db.Teachers.FirstOrDefault(t => t.UserId == user.Id);
+            if (mainTeacher == null) throw new ForbiddenException(ErrorConstants.ForbiddenTeacherError);
+            if (role == null || (!role.IsAdmin && (mainTeacher == null || !mainTeacher.IsMain))) throw new ForbiddenException(ErrorConstants.ForbiddenTeacherError);
+            
             var users = _db.Users.Select(u => UserMapper.MapFromEntityToUserShortModel(u)).ToList();
             return users;
         }
