@@ -254,11 +254,10 @@ namespace api.Services.Impls
         {
             var user = await _accountService.GetUserById(userId);
             var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).ThenInclude(t => t.User).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var student = course.Students.FirstOrDefault(s => s.UserId == studentId);
             if (student == null) throw new BadRequestException($"User with id {studentId} is not signed up for this course.");
             if (editCourseStudentMarkModel == null) throw new BadRequestException(ErrorConstants.EmtyBodyError);
-
-            if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
 
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.UserId == user.Id);
             var teacher = course.Teachers.FirstOrDefault(t => t.UserId == user.Id);

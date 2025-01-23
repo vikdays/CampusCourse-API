@@ -44,7 +44,7 @@ namespace api
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
                     .WithIdentity("EmailNotificationJob-trigger")
-                    .WithCronSchedule("0 0 5 * * ?"));
+                    .WithCronSchedule("0 01 0/1 * * ?"));
             });
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
