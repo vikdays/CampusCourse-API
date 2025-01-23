@@ -220,6 +220,7 @@ namespace api.Services.Impls
         {
             var user = await _accountService.GetUserById(userId);
             var course = await _db.Courses.Include(c => c.Students).ThenInclude(s => s.User).Include(c => c.Teachers).ThenInclude(t => t.User).Include(c => c.Notifications).FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course == null) throw new NotFoundException(ErrorConstants.NotFoundCourseError);
             var student = course.Students.FirstOrDefault(s => s.UserId == studentId);
             if (student == null) throw new BadRequestException($"User with id {studentId} is not signed up for this course.");
             if (editCourseStudentStatusModel == null) throw new BadRequestException(ErrorConstants.EmtyBodyError);
@@ -311,7 +312,7 @@ namespace api.Services.Impls
         public async Task<List<CampusCoursePreviewModel>> GetMyCourses(string userId)
         {
             var user = await _accountService.GetUserById(userId);
-            var courses = await _db.Students.Include(s => s.CampusCourse) .Where(s => s.UserId == user.Id).Select(s => s.CampusCourse).ToListAsync();
+            var courses = await _db.Students.Include(s => s.CampusCourse).ThenInclude(c => c.Students).Where(s => s.UserId == user.Id).Select(s => s.CampusCourse).ToListAsync();
 
             var coursePreviews = courses.Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToList();
             return coursePreviews;
@@ -320,7 +321,7 @@ namespace api.Services.Impls
         public async Task<List<CampusCoursePreviewModel>> GetTeachingCourses(string userId)
         {
             var user = await _accountService.GetUserById(userId);
-            var courses = await _db.Teachers.Include(t => t.CampusCourse).Where(t => t.UserId == user.Id).Select(t => t.CampusCourse).ToListAsync();
+            var courses = await _db.Teachers.Include(t => t.CampusCourse).ThenInclude(c => c.Students).Where(t => t.UserId == user.Id).Select(t => t.CampusCourse).ToListAsync();
 
             var coursePreviews = courses.Select(course => CourseMapper.MapFromCampusCourseToCampusCoursePreviewModel(course)).ToList();
             return coursePreviews;

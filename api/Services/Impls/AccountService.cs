@@ -69,7 +69,7 @@ public class AccountService : IAccountService
         var tokenExpiresAt = DateTime.UtcNow.AddHours(_jwtOptions.ExpiresHours); 
         _db.BannedTokens.Add(new TokenEntity { Token = token, ExpiresAt = tokenExpiresAt });
         await _db.SaveChangesAsync();
-        return await Task.FromResult(new Response(null, "Logout successful"));
+        return await Task.FromResult(new Response("200", "Logout successful"));
     }
 
     public async Task<User> GetUserByToken(string token)
